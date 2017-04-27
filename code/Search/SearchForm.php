@@ -13,7 +13,6 @@ use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\SS_List;
-use Translatable;
 
 /**
  * Standard basic search form which conducts a fulltext search on all {@link SiteTree}
@@ -70,10 +69,17 @@ class SearchForm extends Form
             );
         }
 
-        if (class_exists('Translatable')
-            && SiteTree::singleton()->hasExtension('Translatable')
+        // @todo: Decouple this from the CMS
+        if (class_exists('SilverStripe\\Translatable\\Model\\Translatable')
+            && SiteTree::singleton()->hasExtension('SilverStripe\\Translatable\\Model\\Translatable')
         ) {
-            $fields->push(new HiddenField('searchlocale', 'searchlocale', Translatable::get_current_locale()));
+            $fields->push(
+                new HiddenField(
+                    'searchlocale',
+                    'searchlocale',
+                    \SilverStripe\Translatable\Model\Translatable::get_current_locale()
+                )
+            );
         }
 
         if (!$actions) {
@@ -133,15 +139,16 @@ class SearchForm extends Form
         // set language (if present)
         $locale = null;
         $origLocale = null;
-        if (class_exists('Translatable')) {
+        // @todo Decouple from the CMS
+        if (class_exists('SilverStripe\\Translatable\\Model\\Translatable')) {
             $locale = $request->requestVar('searchlocale');
-            if (SiteTree::singleton()->hasExtension('Translatable') && $locale) {
+            if (SiteTree::singleton()->hasExtension('SilverStripe\\Translatable\\Model\\Translatable') && $locale) {
                 if ($locale === "ALL") {
-                    Translatable::disable_locale_filter();
+                    \SilverStripe\Translatable\Model\Translatable::disable_locale_filter();
                 } else {
-                    $origLocale = Translatable::get_current_locale();
+                    $origLocale = \SilverStripe\Translatable\Model\Translatable::get_current_locale();
 
-                    Translatable::set_current_locale($locale);
+                    \SilverStripe\Translatable\Model\Translatable::set_current_locale($locale);
                 }
             }
         }
@@ -182,12 +189,12 @@ class SearchForm extends Form
         }
 
         // reset locale
-        if (class_exists('Translatable')) {
-            if (SiteTree::singleton()->hasExtension('Translatable') && $locale) {
+        if (class_exists('SilverStripe\\Translatable\\Model\\Translatable')) {
+            if (SiteTree::singleton()->hasExtension('SilverStripe\\Translatable\\Model\\Translatable') && $locale) {
                 if ($locale == "ALL") {
-                    Translatable::enable_locale_filter();
+                    \SilverStripe\Translatable\Model\Translatable::enable_locale_filter();
                 } else {
-                    Translatable::set_current_locale($origLocale);
+                    \SilverStripe\Translatable\Model\Translatable::set_current_locale($origLocale);
                 }
             }
         }

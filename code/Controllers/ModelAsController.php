@@ -18,7 +18,6 @@ use SilverStripe\ORM\DataModel;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
 use Exception;
-use Translatable;
 
 /**
  * ModelAsController deals with mapping the initial request to the first {@link SiteTree}/{@link ContentController}
@@ -125,8 +124,9 @@ class ModelAsController extends Controller implements NestedController
         }
 
         // Find page by link, regardless of current locale settings
-        if (class_exists('Translatable')) {
-            Translatable::disable_locale_filter();
+        // @todo Decouple from the CMS
+        if (class_exists('SilverStripe\\Translatable\\Model\\Translatable')) {
+            \SilverStripe\Translatable\Model\Translatable::disable_locale_filter();
         }
 
         // Select child page
@@ -138,9 +138,9 @@ class ModelAsController extends Controller implements NestedController
         $sitetree = DataObject::get_one('SilverStripe\\CMS\\Model\\SiteTree', $conditions);
 
         // Check translation module
-        // @todo Refactor out module specific code
-        if (class_exists('Translatable')) {
-            Translatable::enable_locale_filter();
+        // @todo Decouple from the CMS
+        if (class_exists('SilverStripe\\Translatable\\Model\\Translatable')) {
+            \SilverStripe\Translatable\Model\Translatable::enable_locale_filter();
         }
 
         if (!$sitetree) {
@@ -148,8 +148,9 @@ class ModelAsController extends Controller implements NestedController
         }
 
         // Enforce current locale setting to the loaded SiteTree object
-        if (class_exists('Translatable') && $sitetree->Locale) {
-            Translatable::set_current_locale($sitetree->Locale);
+        // @todo Decouple from the CMS
+        if (class_exists('SilverStripe\\Translatable\\Model\\Translatable') && $sitetree->Locale) {
+            \SilverStripe\Translatable\Model\Translatable::set_current_locale($sitetree->Locale);
         }
 
         if (isset($_REQUEST['debug'])) {

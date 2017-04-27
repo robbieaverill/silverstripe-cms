@@ -30,7 +30,7 @@ class ZZZSearchFormTest extends FunctionalTest
     protected static $fixture_file = 'SearchFormTest.yml';
 
     protected static $illegal_extensions = array(
-        SiteTree::class => array('SiteTreeSubsites', 'Translatable')
+        SiteTree::class => array('SiteTreeSubsites', 'SilverStripe\\Translatable\\Model\\Translatable')
     );
 
     /**

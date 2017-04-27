@@ -13,7 +13,6 @@ use SilverStripe\Core\Resettable;
 use SilverStripe\Dev\Deprecation;
 use SilverStripe\ORM\DataModel;
 use SilverStripe\ORM\DB;
-use Translatable;
 
 class RootURLController extends Controller implements Resettable
 {
@@ -59,14 +58,17 @@ class RootURLController extends Controller implements Resettable
             }
 
             if (!self::$cached_homepage_link) {
-                // TODO Move to 'translatable' module
-                if (class_exists('Translatable')
-                    && SiteTree::has_extension('Translatable')
-                    && $link = Translatable::get_homepage_link_by_locale(Translatable::get_current_locale())
+                // @todo Move to 'translatable' module
+                if (class_exists('SilverStripe\\Translatable\\Model\\Translatable')
+                    && SiteTree::has_extension('SilverStripe\\Translatable\\Model\\Translatable')
+                    && $link = \SilverStripe\Translatable\Model\Translatable::get_homepage_link_by_locale(
+                        \SilverStripe\Translatable\Model\Translatable::get_current_locale()
+                    )
                 ) {
                     self::$cached_homepage_link = $link;
                 } else {
-                    self::$cached_homepage_link = Config::inst()->get('SilverStripe\\CMS\\Controllers\\RootURLController', 'default_homepage_link');
+                    self::$cached_homepage_link = Config::inst()
+                        ->get('SilverStripe\\CMS\\Controllers\\RootURLController', 'default_homepage_link');
                 }
             }
         }
@@ -110,10 +112,11 @@ class RootURLController extends Controller implements Resettable
     {
         if (!self::$is_at_root && self::get_homepage_link() == trim($page->RelativeLink(true), '/')) {
             return !(
-                class_exists('Translatable')
-                    && $page->hasExtension('Translatable')
+                // @todo Decouple from CMS
+                class_exists('SilverStripe\\Translatable\\Model\\Translatable')
+                    && $page->hasExtension('SilverStripe\\Translatable\\Model\\Translatable')
                     && $page->Locale
-                    && $page->Locale != Translatable::default_locale()
+                    && $page->Locale != \SilverStripe\Translatable\Model\Translatable::default_locale()
             );
         }
 

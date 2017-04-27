@@ -63,7 +63,6 @@ use SilverStripe\Security\Security;
 use SilverStripe\Security\SecurityToken;
 use SilverStripe\View\ArrayData;
 use SilverStripe\View\Requirements;
-use Translatable;
 use InvalidArgumentException;
 use SilverStripe\Versioned\ChangeSet;
 use SilverStripe\Versioned\ChangeSetItem;
@@ -157,8 +156,13 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
     protected function init()
     {
         // set reading lang
-        if (SiteTree::has_extension('Translatable') && !$this->getRequest()->isAjax()) {
-            Translatable::choose_site_locale(array_keys(Translatable::get_existing_content_languages('SilverStripe\\CMS\\Model\\SiteTree')));
+        // @todo: decouple this from the CMS
+        if (SiteTree::has_extension('SilverStripe\\Translatable\\Model\\Translatable')
+            && !$this->getRequest()->isAjax()
+        ) {
+            SilverStripe\Translatable\Model\Translatable::choose_site_locale(
+                array_keys(Translatable::get_existing_content_languages(SiteTree::class))
+            );
         }
 
         parent::init();

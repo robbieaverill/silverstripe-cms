@@ -32,7 +32,7 @@ class VirtualPageTest extends FunctionalTest
     );
 
     protected static $illegal_extensions = array(
-        SiteTree::class => array('SiteTreeSubsites', 'Translatable'),
+        SiteTree::class => array('SiteTreeSubsites', 'SilverStripe\\Translatable\\Model\\Translatable'),
     );
 
     protected static $required_extensions = array(

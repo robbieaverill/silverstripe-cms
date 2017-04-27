@@ -28,7 +28,6 @@ use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\View\ArrayData;
 use SilverStripe\View\Requirements;
 use SilverStripe\View\SSViewer;
-use Translatable;
 
 /**
  * The most common kind of controller; effectively a controller linked to a {@link DataObject}.
@@ -187,16 +186,17 @@ class ContentController extends Controller
         // nested URL.
         if ($action && SiteTree::config()->nested_urls && !$this->hasAction($action)) {
             // See ModelAdController->getNestedController() for similar logic
-            if (class_exists('Translatable')) {
-                Translatable::disable_locale_filter();
+            // @todo Decouple this from the CMS
+            if (class_exists('SilverStripe\\Translatable\\Model\\Translatable')) {
+                \SilverStripe\Translatable\Model\Translatable::disable_locale_filter();
             }
             // look for a page with this URLSegment
             $child = SiteTree::get()->filter(array(
                 'ParentID' => $this->ID,
                 'URLSegment' => rawurlencode($action)
             ))->first();
-            if (class_exists('Translatable')) {
-                Translatable::enable_locale_filter();
+            if (class_exists('SilverStripe\\Translatable\\Model\\Translatable')) {
+                \SilverStripe\Translatable\Model\Translatable::enable_locale_filter();
             }
         }
 
@@ -210,7 +210,8 @@ class ContentController extends Controller
             // If a specific locale is requested, and it doesn't match the page found by URLSegment,
             // look for a translation and redirect (see #5001). Only happens on the last child in
             // a potentially nested URL chain.
-            if (class_exists('Translatable')) {
+            // @todo Decouple this from the CMS
+            if (class_exists('SilverStripe\\Translatable\\Model\\Translatable')) {
                 $locale = $request->getVar('locale');
                 if ($locale
                     && i18n::getData()->validate($locale)
@@ -403,14 +404,17 @@ HTML;
      * Suitable for insertion into lang= and xml:lang=
      * attributes in HTML or XHTML output.
      *
+     * @todo Decouple this from the CMS
      * @return string
      */
     public function ContentLocale()
     {
-        if ($this->dataRecord && $this->dataRecord->hasExtension('Translatable')) {
+        if ($this->dataRecord && $this->dataRecord->hasExtension('SilverStripe\\Translatable\\Model\\Translatable')) {
             $locale = $this->dataRecord->Locale;
-        } elseif (class_exists('Translatable') && SiteTree::has_extension('Translatable')) {
-            $locale = Translatable::get_current_locale();
+        } elseif (class_exists('SilverStripe\\Translatable\\Model\\Translatable')
+            && SiteTree::has_extension('SilverStripe\\Translatable\\Model\\Translatable')
+        ) {
+            $locale = \SilverStripe\Translatable\Model\Translatable::get_current_locale();
         } else {
             $locale = i18n::get_locale();
         }
