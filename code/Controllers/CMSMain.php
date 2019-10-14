@@ -1784,6 +1784,12 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
         $record->HasBrokenLink = 0;
         $record->HasBrokenFile = 0;
 
+        $form->saveInto($record);
+
+        if (!$record->ObsoleteClassName) {
+            $record->writeWithoutVersion();
+        }
+
         // Update the class instance if necessary
         if (isset($data['ClassName']) && $data['ClassName'] != $record->ClassName) {
             // Replace $record with a new instance of the new class
@@ -1791,13 +1797,7 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
             $record = $record->newClassInstance($newClassName);
         }
 
-        // save form data into record
-        $form->saveInto($record);
-        if (!$record->ObsoleteClassName) {
-            $record->writeWithoutVersion();
-        } else {
-            $record->write();
-        }
+        $record->write();
 
         // If the 'Publish' button was clicked, also publish the page
         if ($doPublish) {
